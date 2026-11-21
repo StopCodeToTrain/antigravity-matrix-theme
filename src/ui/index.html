@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matrix Theme Studio — 黑客帝国黑绿主题工作台</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="sr-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <div id="toast-region" class="toast-region" role="region" aria-label="通知"></div>
+
+  <div
+    id="matrix-surface"
+    class="matrix-surface"
+    data-mode="studio"
+    data-scanlines="true"
+    data-rain="subtle"
+  >
+    <canvas id="matrix-rain" class="rain-canvas" aria-hidden="true"></canvas>
+    <div class="crt-scanlines" aria-hidden="true"></div>
+
+    <div class="studio-shell">
+      <header class="studio-header">
+        <div class="brand-row">
+          <div class="brand-identity">
+            <span class="brand-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+                <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.75" />
+                <path d="M6.5 17V7l5.5 6.5L17.5 7v10" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <div class="brand-titles">
+              <h1 class="brand-name">Matrix Theme Studio</h1>
+              <p class="brand-sub">
+                <span id="header-variant-badge" class="status-pill">
+                  <span class="pill-dot" aria-hidden="true">◆</span>
+                  <span id="header-variant-label">经典荧光绿</span>
+                </span>
+                <span id="header-mode-badge" class="status-pill status-pill-muted">STUDIO</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="header-toggles">
+            <div class="segmented-group" role="group" aria-label="数字雨强度" id="rain-controls">
+              <span class="control-label">数字雨</span>
+              <button type="button" class="seg-btn" data-rain="off" aria-pressed="false">○ 关闭</button>
+              <button type="button" class="seg-btn" data-rain="subtle" aria-pressed="true">● 柔和</button>
+              <button type="button" class="seg-btn" data-rain="full" aria-pressed="false">◈ 全开</button>
+            </div>
+
+            <button
+              type="button"
+              id="scanlines-toggle"
+              class="toggle-chip"
+              aria-pressed="true"
+            >
+              <span aria-hidden="true">≡</span>
+              <span>扫描线: <strong id="scanlines-state-text">开启</strong></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="variant-bar" role="group" aria-label="主题变体切换" id="variant-pills"></div>
+      </header>
+
+      <main class="studio-main">
+        <!-- Inline Compact Card View (preview_matrix_card) -->
+        <section id="inline-view" class="inline-view" aria-label="主题预览卡片" hidden>
+          <div class="inline-hero card-panel">
+            <div class="inline-hero-info">
+              <div class="inline-title-row">
+                <h2 id="inline-title" class="section-title">经典荧光绿 (Classic Phosphor)</h2>
+                <span id="inline-wcag-badge" class="wcag-badge wcag-pass">
+                  <span aria-hidden="true">✓</span>
+                  <span id="inline-wcag-text">9/9 WCAG PASS</span>
+                </span>
+              </div>
+              <p id="inline-tagline" class="muted-copy"></p>
+            </div>
+          </div>
+
+          <div class="inline-grid">
+            <article class="card-panel">
+              <div class="panel-head">
+                <span class="panel-title">终端代码预览</span>
+                <span class="mono-tag">matrix-shell.ts</span>
+              </div>
+              <pre id="inline-code-block" class="code-box code-scroll"></pre>
+            </article>
+
+            <article class="card-panel">
+              <div class="panel-head">
+                <span class="panel-title">Diff &amp; Appearance</span>
+                <span class="mono-tag">Base: Dark</span>
+              </div>
+              <div id="inline-diff-block" class="diff-box"></div>
+              <p class="inline-appearance-hint">
+                Antigravity App：打开 <code>Settings &gt; Appearance</code> 选择 <strong>Dark</strong>，点击下方色块即可复制 Hex 色值。
+              </p>
+            </article>
+          </div>
+
+          <div class="card-panel">
+            <div class="panel-head">
+              <span class="panel-title">核心 Token 色板（点击复制）</span>
+              <span class="mono-tag">HEX</span>
+            </div>
+            <div id="inline-swatches" class="inline-swatches"></div>
+          </div>
+
+          <footer class="inline-actions">
+            <button type="button" id="inline-copy-css" class="btn btn-primary">
+              复制 CSS 变量
+            </button>
+            <button type="button" id="inline-copy-guide" class="btn btn-secondary">
+              复制 Appearance 色值
+            </button>
+            <button type="button" id="inline-btn-context" class="btn btn-secondary" hidden>
+              附加主题到对话
+            </button>
+            <button type="button" id="inline-btn-message" class="btn btn-secondary" hidden>
+              发送到对话生成界面
+            </button>
+          </footer>
+        </section>
+
+        <!-- Full 4-Tab Studio View (open_matrix_studio) -->
+        <section id="studio-view" class="studio-view" aria-label="Matrix Theme Studio 工作台">
+          <div class="tabs-toolbar">
+            <div id="studio-tablist" class="studio-tablist" role="tablist" aria-label="工作台功能分页">
+              <button
+                type="button"
+                id="tab-btn-preview"
+                class="tab-btn"
+                role="tab"
+                aria-selected="true"
+                aria-controls="panel-preview"
+                data-tab="preview"
+                tabindex="0"
+              >
+                <span class="tab-index" aria-hidden="true">01</span>
+                <span>预览</span>
+              </button>
+              <button
+                type="button"
+                id="tab-btn-tokens"
+                class="tab-btn"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-tokens"
+                data-tab="tokens"
+                tabindex="-1"
+              >
+                <span class="tab-index" aria-hidden="true">02</span>
+                <span>色板与外观</span>
+              </button>
+              <button
+                type="button"
+                id="tab-btn-customizer"
+                class="tab-btn"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-customizer"
+                data-tab="customizer"
+                tabindex="-1"
+              >
+                <span class="tab-index" aria-hidden="true">03</span>
+                <span>微调</span>
+              </button>
+              <button
+                type="button"
+                id="tab-btn-export"
+                class="tab-btn"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-export"
+                data-tab="export"
+                tabindex="-1"
+              >
+                <span class="tab-index" aria-hidden="true">04</span>
+                <span>应用与导出</span>
+              </button>
+            </div>
+
+            <div id="bridge-status" class="bridge-status" aria-live="off">
+              <span aria-hidden="true">◈</span>
+              <span id="bridge-status-text">独立预览模式</span>
+            </div>
+          </div>
+
+          <!-- Tab 1: Preview -->
+          <div
+            id="panel-preview"
+            class="tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-btn-preview"
+            tabindex="0"
+          >
+            <div class="hero-summary card-panel">
+              <div class="hero-summary-main">
+                <h2 id="preview-variant-name" class="section-title">经典荧光绿 · Classic Phosphor</h2>
+                <p id="preview-variant-desc" class="muted-copy"></p>
+              </div>
+              <div class="hero-summary-badges">
+                <span id="preview-wcag-badge" class="wcag-badge wcag-pass">
+                  <span aria-hidden="true">✓</span>
+                  <span id="preview-wcag-summary">9/9 达标 · 最低 4.62:1</span>
+                </span>
+                <span id="preview-override-badge" class="status-pill status-pill-muted" hidden>
+                  已微调 <strong id="preview-override-count">0</strong> 项
+                </span>
+                <button type="button" id="preview-apply-project-btn" class="btn btn-primary btn-sm">
+                  ⚡ 应用到项目
+                </button>
+              </div>
+            </div>
+
+            <div class="preview-grid">
+              <!-- Simulated Antigravity Chat Card -->
+              <article class="card-panel chat-sim-card">
+                <div class="panel-head">
+                  <span class="panel-title">Antigravity 模拟对话界面</span>
+                  <span class="mono-tag">color-scheme: only dark</span>
+                </div>
+
+                <div class="chat-sim-thread">
+                  <div class="chat-msg chat-msg-user">
+                    <div class="chat-role">USER // 开发者</div>
+                    <p class="chat-text">使用 Matrix 黑绿设计系统构建实时系统监控面板，确保 WCAG AA 对比度达标。</p>
+                  </div>
+
+                  <div class="chat-msg chat-msg-assistant">
+                    <div class="chat-role-row">
+                      <span class="chat-role">AGENT // matrix-architect</span>
+                      <span class="tool-chip">✓ matrix-studio::open_matrix_studio</span>
+                    </div>
+                    <p class="chat-text">
+                      已应用 <strong id="sim-variant-inline">经典荧光绿</strong> Token 规范：主背景锁定
+                      <code id="sim-bg-code">#040805</code>，高纯荧光绿强调关键操作，文本对比度全部通过无障碍审计。
+                    </p>
+                    <div class="chat-sim-actions">
+                      <button type="button" class="btn btn-primary btn-sm" id="sim-apply-btn">
+                        复制当前 CSS 变量
+                      </button>
+                      <button type="button" class="btn btn-secondary btn-sm" id="sim-jump-export-btn">
+                        前往导出格式 →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Code Snippet Preview -->
+              <article class="card-panel">
+                <div class="panel-head">
+                  <span class="panel-title">语法高亮预览</span>
+                  <span class="mono-tag">theme-runtime.ts</span>
+                </div>
+                <pre id="preview-code-block" class="code-box code-scroll"></pre>
+              </article>
+
+              <!-- Inline Git Diff Preview -->
+              <article class="card-panel">
+                <div class="panel-head">
+                  <span class="panel-title">内联 Git Diff 预览</span>
+                  <span class="mono-tag">styles.css</span>
+                </div>
+                <div id="preview-diff-block" class="diff-box"></div>
+              </article>
+
+              <!-- WCAG Status Summary Card -->
+              <article class="card-panel">
+                <div class="panel-head">
+                  <span class="panel-title">WCAG 2.1 对比度摘要</span>
+                  <span class="mono-tag">9 组核心配色</span>
+                </div>
+                <div id="preview-wcag-strip" class="wcag-mini-grid"></div>
+              </article>
+            </div>
+          </div>
+
+          <!-- Tab 2: Palette & Antigravity Appearance -->
+          <div
+            id="panel-tokens"
+            class="tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-btn-tokens"
+            tabindex="0"
+            hidden
+          >
+            <article id="appearance-guide-card" class="card-panel appearance-card">
+              <div class="panel-head">
+                <div>
+                  <h2 class="section-title">Antigravity App Settings &gt; Appearance 快速配置卡</h2>
+                  <p class="muted-copy">
+                    注：Antigravity 宿主不开放插件直接覆写宿主 CSS 的 API；请在 <code>Settings &gt; Appearance</code> 中选择 <strong>Dark</strong> 模式，并点击下方色值卡片一键复制对应 Hex。
+                  </p>
+                </div>
+                <button type="button" id="copy-appearance-guide-btn" class="btn btn-primary btn-sm">
+                  复制完整 Appearance 指南
+                </button>
+              </div>
+              <div id="appearance-mappings-grid" class="appearance-grid"></div>
+            </article>
+
+            <div class="card-panel">
+              <div class="panel-head">
+                <div>
+                  <h2 class="section-title">完整设计 Token 色板（点击任意色块复制 Hex）</h2>
+                  <p class="muted-copy">按表面层级、文本、强调色、边框滚动条、语义状态、语法与数字雨分组。</p>
+                </div>
+              </div>
+              <div id="swatch-groups" class="swatch-groups"></div>
+            </div>
+
+            <div class="card-panel">
+              <div class="panel-head">
+                <div>
+                  <h2 class="section-title">实时 WCAG 2.1 对比度审计表</h2>
+                  <p class="muted-copy">正文与强调文本需 ≥ 4.5:1，边框与滚动条 UI 边界需 ≥ 3.0:1。</p>
+                </div>
+                <span id="tokens-wcag-badge" class="wcag-badge wcag-pass">
+                  <span aria-hidden="true">✓</span>
+                  <span id="tokens-wcag-text">9/9 PASS</span>
+                </span>
+              </div>
+              <div class="table-scroll">
+                <table class="wcag-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">对比组合 (Pair)</th>
+                      <th scope="col">前景色</th>
+                      <th scope="col">背景色</th>
+                      <th scope="col">实测比值</th>
+                      <th scope="col">阈值要求</th>
+                      <th scope="col">等级与状态</th>
+                    </tr>
+                  </thead>
+                  <tbody id="wcag-audit-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: Customizer -->
+          <div
+            id="panel-customizer"
+            class="tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-btn-customizer"
+            tabindex="0"
+            hidden
+          >
+            <div class="customizer-layout">
+              <div class="card-panel customizer-editor-panel">
+                <div class="panel-head">
+                  <div>
+                    <h2 class="section-title">核心 Token 实时微调</h2>
+                    <p class="muted-copy">支持颜色选择器与十六进制 Hex 输入（#RRGGBB），修改即时反映到全界面。</p>
+                  </div>
+                </div>
+
+                <div id="customizer-controls" class="customizer-controls"></div>
+
+                <div class="customizer-actions">
+                  <button type="button" id="save-overrides-btn" class="btn btn-primary">
+                    保存微调到工作区
+                  </button>
+                  <button type="button" id="reset-overrides-btn" class="btn btn-secondary">
+                    重置当前变体
+                  </button>
+                </div>
+              </div>
+
+              <div class="customizer-side">
+                <article class="card-panel">
+                  <div class="panel-head">
+                    <span class="panel-title">微调实时对比度与预览</span>
+                    <span id="customizer-wcag-badge" class="wcag-badge wcag-pass">
+                      <span aria-hidden="true">✓</span>
+                      <span id="customizer-wcag-text">9/9 PASS</span>
+                    </span>
+                  </div>
+                  <div id="customizer-live-preview" class="mini-live-box">
+                    <div class="mini-live-header">
+                      <span>// LIVE SHELL PREVIEW</span>
+                      <span class="mini-live-chip">ACTIVE</span>
+                    </div>
+                    <p class="mini-live-body">
+                      主文本在主背景与次级面板上保持清晰可读，边框与聚焦环具备明确边界。
+                    </p>
+                    <pre class="mini-live-code"><code><span class="tok-kw">export</span> <span class="tok-var">matrixMode</span> <span class="tok-op">=</span> <span class="tok-str">"phosphor"</span><span class="tok-punc">;</span></code></pre>
+                    <div id="customizer-pair-checks" class="mini-pair-checks"></div>
+                  </div>
+                </article>
+
+                <article class="card-panel">
+                  <div class="panel-head">
+                    <span class="panel-title">自定义预设管理</span>
+                    <span class="mono-tag">Presets</span>
+                  </div>
+                  <form id="save-preset-form" class="preset-form">
+                    <label for="preset-name-input" class="sr-only">自定义预设名称</label>
+                    <input
+                      id="preset-name-input"
+                      type="text"
+                      class="text-input"
+                      maxlength="40"
+                      placeholder="输入预设名称（例如：Neo 深夜绿）"
+                      required
+                    />
+                    <button type="submit" class="btn btn-primary btn-sm">保存预设</button>
+                  </form>
+                  <div id="custom-presets-list" class="custom-presets-list"></div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 4: Apply & Export -->
+          <div
+            id="panel-export"
+            class="tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-btn-export"
+            tabindex="0"
+            hidden
+          >
+            <article id="apply-project-card" class="card-panel apply-project-card">
+              <div class="panel-head">
+                <div>
+                  <h2 class="section-title">⚡ 一键应用到当前项目 (Apply to Project)</h2>
+                  <p class="muted-copy">
+                    将当前主题（含实时微调 Token）直接写入目标项目的样式文件，并可选自动注入入口 CSS <code>@import</code>。
+                  </p>
+                </div>
+                <span class="mono-tag">apply_matrix_theme_to_project</span>
+              </div>
+
+              <form id="apply-project-form" class="apply-form" novalidate>
+                <div class="apply-form-grid">
+                  <div class="form-field apply-field-wide">
+                    <label for="apply-project-dir" class="form-label">目标项目目录（绝对路径）</label>
+                    <input
+                      id="apply-project-dir"
+                      type="text"
+                      class="text-input"
+                      placeholder="例如：E:\my-web-app"
+                      autocomplete="off"
+                      spellcheck="false"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-field">
+                    <label for="apply-output-dir" class="form-label">输出子目录（相对路径）</label>
+                    <input
+                      id="apply-output-dir"
+                      type="text"
+                      class="text-input"
+                      value="styles/matrix-theme"
+                      placeholder="styles/matrix-theme"
+                      autocomplete="off"
+                      spellcheck="false"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-field">
+                    <label for="apply-auto-import" class="form-label">自动引入到入口 CSS（可选）</label>
+                    <input
+                      id="apply-auto-import"
+                      type="text"
+                      class="text-input"
+                      placeholder="例如：src/index.css"
+                      autocomplete="off"
+                      spellcheck="false"
+                    />
+                  </div>
+                </div>
+
+                <fieldset class="apply-targets-fieldset">
+                  <legend class="form-label">选择写入的主题文件格式</legend>
+                  <div class="apply-targets-row">
+                    <label class="checkbox-pill">
+                      <input type="checkbox" name="apply-target" value="css" checked />
+                      <span>CSS 变量 (<code>matrix-theme.css</code>)</span>
+                    </label>
+                    <label class="checkbox-pill">
+                      <input type="checkbox" name="apply-target" value="tailwind" checked />
+                      <span>Tailwind v4 (<code>matrix-tailwind.css</code>)</span>
+                    </label>
+                    <label class="checkbox-pill">
+                      <input type="checkbox" name="apply-target" value="json" />
+                      <span>JSON Tokens (<code>matrix-tokens.json</code>)</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <div class="apply-submit-row">
+                  <button type="submit" id="apply-project-btn" class="btn btn-primary">
+                    ⚡ 一键写入项目主题文件
+                  </button>
+                  <span class="muted-copy">
+                    默认跳过工作区路径限制检查，仅允许向绝对目标目录内安全写入（禁止 <code>..</code> 越界）。
+                  </span>
+                </div>
+              </form>
+
+              <div id="apply-result-box" class="apply-result-box" hidden></div>
+            </article>
+
+            <div class="card-panel export-panel">
+              <div class="export-header">
+                <div>
+                  <h2 class="section-title">导出主题代码与配置</h2>
+                  <p class="muted-copy">含当前变体及所有已微调 Token，零外部依赖可直接用于生产或 Artifact。</p>
+                </div>
+                <div class="export-format-tabs" role="group" aria-label="导出格式选择" id="export-format-tabs">
+                  <button type="button" class="format-btn" data-format="css" aria-pressed="true">CSS Variables</button>
+                  <button type="button" class="format-btn" data-format="tailwind" aria-pressed="false">Tailwind v4</button>
+                  <button type="button" class="format-btn" data-format="json" aria-pressed="false">JSON Tokens</button>
+                  <button type="button" class="format-btn" data-format="antigravity-guide" aria-pressed="false">Appearance 指南</button>
+                  <button type="button" class="format-btn" data-format="html-template" aria-pressed="false">HTML Artifact 模板</button>
+                </div>
+              </div>
+
+              <div class="export-meta-bar">
+                <div class="export-file-info">
+                  <span id="export-filename" class="mono-tag">matrix-classic-phosphor.css</span>
+                  <span id="export-language" class="status-pill status-pill-muted">css</span>
+                </div>
+                <div class="export-buttons">
+                  <button type="button" id="copy-export-btn" class="btn btn-primary btn-sm">
+                    复制导出代码
+                  </button>
+                </div>
+              </div>
+
+              <pre id="export-code-pre" class="code-box export-code-box code-scroll"><code id="export-code-content"></code></pre>
+
+              <div id="export-host-actions" class="export-host-actions">
+                <button type="button" id="btn-update-context" class="btn btn-primary" hidden>
+                  附加主题到对话
+                </button>
+                <button type="button" id="btn-send-message" class="btn btn-secondary" hidden>
+                  发送到对话生成界面
+                </button>
+                <p id="host-capabilities-note" class="muted-copy capability-note">
+                  当前宿主环境未启用对话注入能力（或处于全局工作台视图），请使用上方“复制导出代码”。
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "matrix-studio": {
+      "command": "node",
+      "args": [
+        "${PLUGIN_ROOT}/scripts/mcp-server.cjs",
+        "--data-dir",
+        "${PLUGIN_DATA}"
+      ]
+    }
+  }
+}

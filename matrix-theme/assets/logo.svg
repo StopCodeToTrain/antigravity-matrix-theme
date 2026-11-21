@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+  <title>Matrix Theme Studio Logo</title>
+  <!-- ~10% transparent outer margin around 208x208 obsidian surface -->
+  <rect x="24" y="24" width="208" height="208" rx="40" fill="#060D08" stroke="#00FF41" stroke-width="5"/>
+  <!-- Inner technical CRT bezel -->
+  <rect x="35" y="35" width="186" height="186" rx="30" stroke="#1D4A29" stroke-width="2"/>
+
+  <!-- Subtle digital rain columns (left, center, right) -->
+  <g>
+    <!-- Left rain stream -->
+    <rect x="52" y="54" width="6" height="12" rx="1.5" fill="#1D4A29"/>
+    <rect x="52" y="72" width="6" height="18" rx="1.5" fill="#2D8A46"/>
+    <rect x="52" y="96" width="6" height="10" rx="1.5" fill="#00FF41"/>
+    <rect x="52" y="110" width="6" height="6" rx="1.5" fill="#D9FFE2"/>
+    <rect x="52" y="168" width="6" height="14" rx="1.5" fill="#1D4A29"/>
+    <rect x="52" y="188" width="6" height="10" rx="1.5" fill="#2D8A46"/>
+
+    <!-- Center accent rain drops -->
+    <rect x="125" y="50" width="6" height="10" rx="1.5" fill="#1D4A29"/>
+    <rect x="125" y="65" width="6" height="12" rx="1.5" fill="#2D8A46"/>
+    <rect x="125" y="82" width="6" height="7" rx="1.5" fill="#8BE8A2"/>
+    <rect x="125" y="176" width="6" height="14" rx="1.5" fill="#2D8A46"/>
+    <rect x="125" y="195" width="6" height="8" rx="1.5" fill="#00FF41"/>
+
+    <!-- Right rain stream -->
+    <rect x="198" y="56" width="6" height="14" rx="1.5" fill="#1D4A29"/>
+    <rect x="198" y="76" width="6" height="12" rx="1.5" fill="#2D8A46"/>
+    <rect x="198" y="138" width="6" height="14" rx="1.5" fill="#1D4A29"/>
+    <rect x="198" y="158" width="6" height="18" rx="1.5" fill="#00FF41"/>
+    <rect x="198" y="180" width="6" height="6" rx="1.5" fill="#D9FFE2"/>
+  </g>
+
+  <!-- Corner HUD bracket ticks for crisp geometric contrast -->
+  <path d="M46 60 V48 H58 M198 48 H210 V60 M46 196 V208 H58 M198 208 H210 V196" stroke="#2D8A46" stroke-width="2.5" stroke-linecap="square"/>
+
+  <!-- Stylized geometric Matrix "M" monogram -->
+  <path
+    d="M72 182 V78 H92 L128 134 L164 78 H184 V182 H164 V116 L128 170 L92 116 V182 H72 Z"
+    fill="#00FF41"
+  />
+  <!-- High-contrast phosphor terminal highlights on monogram peaks and apex -->
+  <rect x="72" y="78" width="20" height="5" fill="#D9FFE2"/>
+  <rect x="164" y="78" width="20" height="5" fill="#D9FFE2"/>
+  <polygon points="122,134 134,134 128,144" fill="#D9FFE2"/>
+  <!-- Bottom cursor bar accent -->
+  <rect x="72" y="188" width="20" height="4" rx="1" fill="#8BE8A2"/>
+  <rect x="164" y="188" width="20" height="4" rx="1" fill="#8BE8A2"/>
+</svg>

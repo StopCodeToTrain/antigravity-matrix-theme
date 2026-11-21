@@ -1,0 +1,28 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "matrix-theme",
+  "displayName": "Matrix Theme Studio",
+  "version": "1.0.0",
+  "description": "Matrix Theme Studio — 黑客帝国风黑绿主题工作台与设计系统插件：提供 3 套 WCAG 达标黑绿配色（经典荧光绿 / 护眼暗绿 / 高对比终端）、MCP App 数字雨实时预览、CSS/Tailwind Token 导出与赛博 UI 生成技能。",
+  "logo": "assets/logo.svg",
+  "suggestedPrompts": [
+    "打开 Matrix Theme Studio 预览并对比 3 套黑客帝国黑绿主题",
+    "导出护眼暗绿 (Zion Dark) 的 CSS 变量与 Tailwind v4 主题配置",
+    "使用黑客帝国黑绿设计系统生成一个实时系统监控 HTML Artifact 仪表盘"
+  ],
+  "author": {
+    "name": "Matrix Theme Studio"
+  },
+  "homepage": "https://github.com/StopCodeToTrain/antigravity-matrix-theme",
+  "repository": "https://github.com/StopCodeToTrain/antigravity-matrix-theme",
+  "license": "MIT",
+  "keywords": [
+    "matrix",
+    "theme",
+    "dark",
+    "cyberpunk",
+    "green",
+    "design-tokens",
+    "mcp-app"
+  ]
+}
